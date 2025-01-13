@@ -28,6 +28,8 @@ Now you'll use the Dev Spaces to develop a new Generative AI feature, an email g
 
 === Create a new Gen AI email service
 
+TODO: update paragraph for Node.js
+
 You'll create a new Java AI service that generates emails based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face models, or Ollama, with the following key features and benefits:
 
 * *Key Features*
@@ -40,6 +42,8 @@ You'll create a new Java AI service that generates emails based on https://devel
 ** *Simplified LLM Integration*: The extension streamlines the process of incorporating LLMs into your application, saving development time and effort.
 ** *Declarative Approach*: It offers a declarative way to interact with LLMs, making the code more readable and maintainable. You specify what you want the LLM to do, and the extension handles the underlying communication.
 ** *Embedding Support*: Supports Diverse LLMs: The extension is designed to work with a variety of LLM providers, giving you flexibility in choosing the LLM that best suits your needs.
+
+END TODO: update paragraph for Node.js
 
 ==== Create a new branch in Gitlab
 
@@ -56,6 +60,8 @@ git checkout -b new-gen-ai-service
 ----
 
 ==== Get started with live coding
+
+TODO: start here for NOde.js code changes
 
 Before you start coding, you need to start with the *Quarkus Dev Mode* that is a powerful feature to significantly speed up the development lifecycle of Quarkus applications. It provides hot reload capabilitiesn (Live Coding), allowing you to see the results of your code changes instantly without requiring a full application restart.
 
@@ -226,7 +232,11 @@ quarkus.langchain4j.openai.parasol-email.base-url=http://parasol-instruct-predic
 <5> Specify the base URL of the LLM inference endpoint that the application will connect to
 
 
+TODO: start here for NOde.js code changes
+
 === Update the frontend web application in Parasol Insurance
+
+TODO: THis is the front-end, so no Quarkus stuff here, but where will the front-end live?  directory structure might be different based on location
 
 Let's update the frontend React web application to give our customer service reps a nice interface for generating emails.
 
@@ -352,6 +362,8 @@ import { EmailGenerate } from './components/EmailGenerate/EmailGenerate';
 
 ==== Local test the new feature
 
+TODO: update for Node.js local testing
+
 Before committing, do a quick functional test locally to ensure you got all the changes correct. If you stopped the Quarkus dev mode, start it again.
 
 Reload the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[Parasol web page^].
@@ -414,6 +426,8 @@ Click on the *Source Control* icon. Then, follow the next steps.
 * Click on Commit *arrow*.
 * Select the option *Commit & Push*.
 
+TODO: image needs an update for Node.js.  needs to list the NOde.js files we added/updated instead of the java ones
+
 image::devhub/dev_commit.png[]]
 
 In Git, code changes are typically staged before being committed. This staging process allows you to selectively choose which parts of your code to include in the next commit. While using remote branches is generally recommended for collaborative development and managing code across multiple machines, in this workshop, we'll streamline the process by creating a pull request directly to your working repository. This will help us focus on the core concepts and techniques without getting bogged down in the complexities of remote branches.
@@ -449,6 +463,8 @@ image::devhub/pr_devhub.png[]
 
 Select the https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/merge_requests/1/diffs[Changes^] tab in the *Gitlab* to review what code has changed in the pull request. This should be done by an application architect or senior developer in general.
 
+TODO: needs an update for Node.js.  needs to show the Node.js files instead of the Java ones
+
 image::devhub/review_pr.png[]
 
 Switch back to the *Overview* tab and click on *Merge* to merge the pull request. Note that the reviewer usually approves the pull request before merging.
@@ -470,6 +486,8 @@ Monitor if the new deployment rolls out by the OpenShift GitOps in the Dev Hub w
 Go back to your frontend component on the Red Hat Developer Hub: https://backstage-backstage.{openshift_cluster_ingress_domain}/catalog/default/component/parasol-app-{user}[Red Hat Developer Hub UI^].
 
 Explore the pipelines by clicking on the `CI` tab. *A new pipeline* will be triggered to build the new Gen AI feature. Wait for pipeline to finish.
+
+TODO: needs an update for NOde.js.  currently shows a maven pipeline tasks that needs to be "npm install" or something similar
 
 image::devhub/frontend_newpipeline.png[]
 

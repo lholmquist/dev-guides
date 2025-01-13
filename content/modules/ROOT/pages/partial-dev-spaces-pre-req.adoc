@@ -47,4 +47,6 @@ image::devhub/devspaces_trustauthors.png[devspaces_trustauthors, 800]
 
 Then you should see:
 
+TODO: image update for NOde.js.  currently shows a maven project in vscode
+
 image::devhub/devspaces_view.png[devspaces_view, 800]

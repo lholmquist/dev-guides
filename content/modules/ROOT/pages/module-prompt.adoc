@@ -44,6 +44,8 @@ Depending on use case, it may be necessary for the LLM to produce a more creativ
 
 Lastly, while experimenting with LLMs, especially with inferencing servers without a powerful GPU, it is recommended to constrain the LLM from producing overly verbose responses by setting the Max Tokens to an appropriate threshold.  This also helps coach the LLM to be more concise with its responses, which can be helpful during testing.
 
+TODO: this whole next section will either need a Node.js counterpart or needs to be removed
+
 === Quarkus Dev UI with LangChain4j Chat Extension
 
 We are using https://quarkus.io[Quarkus^] and https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html[LangChain4j^] extensively throughout this workshop, and LangChain4j provides a Dev UI extension for testing system and user prompts.  While it is a simpler experience compared to other tools, Dev UI is pre-configured to communicate with the same model and settings that our Parasol application is using.  That model is exposed with an https://platform.openai.com/docs/api-reference[OpenAI-compliant API^] through https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai[OpenShift AI^] and has already been trained with Parasol Insurance business rules and content.
@@ -82,8 +84,12 @@ For the remainder of the lab, you will be using the Quarkus Dev UI with the Lang
 
 IMPORTANT: If you haven't accessed *Red Hat Developer Hub and Red Hat Dev Spaces* yet, complete the following sections. Otherwise, *proceed* to the <<Chat with the Model>> section.
 
+END TODO: this whole next section will either need a Node.js counterpart or needs to be removed
+
 include::partial-devhub-pre-req.adoc[]
 include::partial-dev-spaces-pre-req.adoc[]
+
+TODO: this whole next section will either need a Node.js counterpart or needs to be removed
 
 == Chat with the Model
 
@@ -509,11 +515,17 @@ The response should look like this:
 
 image::prompt/output_example_existing_2.png[output_example_existing_2]
 
+END TODO: this whole next section will either need a Node.js counterpart or needs to be removed
+
+TODO: title needs an update for Node.js
+
 == Update the Parasol Insurance Java App with New Prompt
 
 === Objectives
 
 Now that you've developed a working prompt that can help satisfy leadership objectives with its first Generative AI initiative, you need to incorporate this logic into the Parasol Insurance application so that ongoing business value may be realized.  For this exercise that involves updating the Email Response REST service and UI to provide an recommended recipient, email subject, and automated response based on a given customer email.
+
+TODO: important section needs a Node.js update .  needs a bash script for those that skipped the first section
 
 [IMPORTANT]
 ====
@@ -532,9 +544,14 @@ Access the https://parasol-app-{user}-dev-parasol-app-{user}-dev.{openshift_clus
 
 Now that we've developed a robust prompt that helps address the Parasol Insurance use case for email handling, we must integrate that prompt into the Parasol application.
 
+TODO: update references of Langchain4j
+
 During a prior workshop activity, email response generation using LangChain4j was implemented into the web UI.  This functionality includes a new menu option on the left hand side of the screen that, when clicked, opens a web form for providing the customer email.  We are going to replace the prompt used in that module with the one you created above that includes more functionality and data elements.
 
 image::prompt/parasol-generate-email-response-form.png[Generate Email Response Web Form]
+
+TODO: update references of Langchain4j
+TODO: source code imagge needs to be updated
 
 The Parasol Insurance application is invoking the LLM using LangChain4j's AI Service framework.  This approach leverages Java Interfaces created by the user with annotations that define the prompt using a String.  Let's open the AI Service that was previously created for Email Response Generation:
 
@@ -545,6 +562,8 @@ Now, change the current prompt to the one we created together in the previous se
 *Before:*
 
 image::prompt/email-branch-before.png[LangChain4j Email Service Before Functionality Expansion]
+
+TODO: prompt might need to look different based on langchain.js formatting
 
 Replace the text in the red rectangle with the following revised system prompt.
 
@@ -624,7 +643,11 @@ Your response must only include the specified JSON object.
 
 *After:*
 
+TODO: image will need a Node.js update
+
 image::prompt/email-branch-after.png[LangChain4j Email Service After Functionality Expansion]
+
+TODO: needs a Node.js update
 
 Assuming your Quarkus environment is still running from the prior steps, the updated prompt is automatically compiled and applied.  Let's try out the email form and see a subset of the new response:
 
@@ -635,6 +658,8 @@ Assuming your Quarkus environment is still running from the prior steps, the upd
 image::prompt/new-email-generate-basic.png[New Generate Email Response]
 
 Now, you'll notice that this does not look drastically different from before the enhancement.  Let's now add the Forward-To Email Address to the form.
+
+TODO: might need to change the directory structure based on the front-end location
 
 Open the `src/main/webui/src/app/components/EmailGenerate/EmailGenerate.tsx` typescript file for the Generate Email view.
 
@@ -660,6 +685,8 @@ Add the following html to the `email-response` div block:
 
 image::prompt/email_response_address.png[email_response_address]
 
+TODO: needs an update for Node.js
+
 Additionally, we must add the address field to the REST Service's JSON Response.
 
 Open the `src/main/java/org/parasol/model/EmailResponse.java` file and `replace` the Java record signature with the following code.
@@ -677,15 +704,25 @@ LangChain4j uses this to suggest JSON response syntax to the LLM and our example
 public record EmailResponse(String address, String subject, String message) { }
 ----
 
+TODO: update image for NOde
+
 image::prompt/new-field-added-to-email-response.png[Add "address" field to EmailResponse Record]
 
+
+END TODO: needs an update for Node.js
+
+
 Now let's revisit the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[web form^] and test out the new AI-generated attribute:
+
+TODO: update needed talking about quarkus dev mode
 
 - Reload the Email generate page. It take 10 - 20 seconds to recompile and apply the new prompt in the Quarkus dev mode.
 - Copy and paste the new claim #1 example from the prior section into the form.
 - Click on `Submit`.
 
 image::prompt/modernization-complete.png[Modernization Complete!]
+
+TODO: update needed talking about quarkus dev mode
 
 Stop the Quarkus dev mode environment by kbd:[Ctrl+C].
 
@@ -696,6 +733,8 @@ Congratulations! You have successfully modernized the Parasol Insurance applicat
 We hope you have enjoyed this module!
 
 Here is a quick summary of what we have learned:
+
+TODO: update needed talking about summary and quarkus
 
 - Learned how to use the Quarkus Dev UI to chat with a trained model
 - Explored common use cases for gaining value from an LLM, such as agents and content analysis

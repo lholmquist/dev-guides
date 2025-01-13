@@ -5,6 +5,8 @@
 
 Click on `CI` tab to review your pipeline information. The pipeline will be automatically triggered and run. After a few minutes, you will see the pipeline finished as *Succeeded*.
 
+TODO: image will need an update for NOde.js .  Currently has maven as a pipeline step
+
 image::devhub/parasol_pipeline.png[]
 
 Click on `CD` to review ArgoCD History.
@@ -14,6 +16,8 @@ image::devhub/frontend_argohistory.png[]
 Click on `TOPOLOGY` to review your deployment status. Then, you will see the deployment *parasol-app-{user}* in the Topology.
 
 NOTE: If the deployment shows up as **red**, make sure to wait until the **Pipeline Run** on the `CI` tab completes successfully.
+
+TODO: image update for Node.js. currently shows quarkus pod
 
 image::devhub/parasol_deployment.png[]
 

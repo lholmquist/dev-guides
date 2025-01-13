@@ -68,9 +68,13 @@ Follow the next steps to create a component based on the pre-defined Software Te
 parasol-app-{user}
 ----
 
+TODO: Needs to change for Node.js
+
 * *Group Id*: Maven Group Id. (leave this as-is)
 * *Artifact Id*: Maven Artifact Id. (leave this as-is)
 * *Java Package Name*: Name for the java package. (e.g. `org.redhat.janus` - leave this as-is)
+
+TODO: needs update image for Node.js
 
 image::devhub/st_app_info.png[]
 
@@ -96,6 +100,8 @@ Leave the all fields as they are.
 
 When you click on *Review*, you will see the following review information.
 
+TODO: will need update image based on the Node.js changes
+
 image::devhub/st_component_review.png[]
 
 Click on *Create* to proceed.
@@ -119,6 +125,8 @@ image::devhub/parasol_overview.png[]
 === View source
 
 Click on `VIEW SOURCE` to access the new source code repository created.
+
+TODO: image will need an update for NOde.js ...possibly
 
 image::devhub/parasol_source.png[]
 

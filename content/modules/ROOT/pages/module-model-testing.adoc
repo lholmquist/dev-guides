@@ -14,6 +14,8 @@
 </script>
 ++++
 
+TODO: all the tests are node.js related. The only thing is where would these be located in our project?
+
 == Goals of this lab
 
 Parasol's developers are always expected to thoroughly test their code. In this exercise, you will explore the unique challenges and techniques involved in testing AI models and applications, which differ significantly from traditional enterprise applications. Traditional apps often have deterministic outputs, whereas AI models can produce varied and context-dependent results, requiring specialized testing approaches. A number of tools are being developed to help enable model testing for example promptfoo, deepeval, and deepchecks. In this module we will use one of these tools "promptfoo" to test the consistency of model responses.

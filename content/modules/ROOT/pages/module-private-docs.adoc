@@ -39,6 +39,8 @@ include::partial-dev-spaces-pre-req.adoc[]
 
 https://developers.redhat.com/products/openshift-dev-spaces/overview[Red Hat OpenShift Dev Spaces^] is a cloud-based development environment built on top of Kubernetes and containers. It offers a streamlined and secure way for developers to code, build, and test applications directly within the OpenShift ecosystem. You'll use the Dev Spaces environment in this module to enhance the current functionality of the Parasol Insurance application.
 
+TODO: needs an update for Node.js
+
 === Using LangChain4j with Quarkus
 
 You'll be building new features in this application, based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face, or Ollama. It has the following key features and benefits:
@@ -48,9 +50,13 @@ You'll be building new features in this application, based on https://developers
 ** *Embedding Support*: Integrates with document embedding stores like Redis, Chroma, or Infinispan to store and retrieve document context for the LLM.
 ** *Observability Integration*: Allows monitoring and logging of LLM interactions within your Quarkus application.
 
+END TODO: needs an update for Node.js
+
 include::partial-revert-devspaces-workspace.adoc[]
 
 === Understanding the application's codebase
+
+START TODO: update for Node.js .
 
 This Quarkus application is a customer service processing tool that handles customer claim emails for Parasol insurance. The team has recently improved the application with a chatbot to interact with the agent and to generate responses based on the email content. In the VS Code environment, navigate to the `src/main/java/org/parasol` directory, which contains the main source code of the application.
 
@@ -97,6 +103,8 @@ After a minute or 2, depending on network speeds, your application will be up an
 image::private-docs/quarkus-dev.png[Quarkus dev]
 
 Go ahead and click the **Open In New Tab** button that shows up in the bottom right
+
+END TODO: update for Node.js .
 
 [NOTE]
 ====
@@ -167,6 +175,8 @@ On the other hand, choose fine-tuning when your task is specialized and you need
 TIP: See the xref:module-ilab.adoc[AI Model Fine-Tuning module,window=_blank] for more information on fine-tuning models.
 
 === Add Parasol-specific policies to the LLM's knowledge base with RAG
+
+START TODO: update for Node.js .
 
 While we could use a https://www.ibm.com/topics/vector-database[vector database^] to store vectorized data to use with RAG, we can also simply specify a directory where text-based files are stored. We can then parse this data, retrieve similar data, vectorize it, and pass it along to our LLM calls. This process is made very easy with the aptly named https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html["Easy RAG" extension in Quarkus^].
 
@@ -243,7 +253,13 @@ image::private-docs/chat-response-rag.png[Chat response with RAG]
 
 NOTE: The actual result you see may differ from the screenshot due to the non-deterministic nature of LLMs.
 
+END TODO: update for Node.js .
+
 == Enhancing functionality with tools and agents
+
+TODO: For node.js, i've made this a whole other branch.  THis section needs an update for Node.js.
+
+TODO: possibly remove the parts talking about the mail extensions
 
 Until now we have had fairly straightforward interactions with the AI LLM model, in that we have asked it questions and it responded with some text and it was up to us to interpret the result.
 
@@ -433,6 +449,8 @@ You can now verify that the user received the email!
 
 == Observability of AI-infused applications
 
+TODO: We don't have this for Node.js yet.  COuld this be where we talk about langsmith/langgraph or whatever it's actually called? 
+
 === What is OpenTelemetry?
 
 OpenTelemetry is a collection of tools, APIs, and SDKs. Use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) to help you analyze your software's performance and behavior.
@@ -510,6 +528,8 @@ image::private-docs/jaeger-trace-model-http-info.png[Trace Model info]
 This is all very useful information!
 
 == Conclusion
+
+TODO: needs updates for Node.js related stuff
 
 We hope you have enjoyed this module!
 

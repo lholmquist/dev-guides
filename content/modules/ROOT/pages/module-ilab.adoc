@@ -65,6 +65,8 @@ As you work with InstructLab, you will see the terms _Skills_ and _Knowledge_. W
 
 image::ilab/launch-terminal.png[Launch Terminal]
 
+TODO: does this need java for anything else besides running the parasol app.  If not then made this is switched to installing Node to run the application?
+
 ==== Install Java 21
 
 Run the following `sdk` command in the terminal.
