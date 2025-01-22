@@ -30,9 +30,7 @@ RHEL AI, Red Hat Developer tools, and OpenShift AI as shown below.
 image::dev-flow.png[title="Red Hat Products", link=self, window=blank]
 TODO: image needs an update
 
-TODO: paragraph needs an update
-
-The AI-infused application is built on `Node.js`, a modern high-performance Java framework designed for building microservices and serverless applications. It's built on a combination of technologies, including GraalVM, Hot Reload, and Kubernetes-native features, making it a powerful and efficient choice for Java developers.
+The AI-infused application is built on `Node.js`, an open source JavaScript runtime environment designed to build modern scalable applications. Node.js enables developers to run JavaScript outside the browser, facilitating web development across back ends and front ends.
 
 == Get started
 

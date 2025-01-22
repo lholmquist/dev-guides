@@ -28,20 +28,26 @@ Now you'll use the Dev Spaces to develop a new Generative AI feature, an email g
 
 === Create a new Gen AI email service
 
-TODO: update paragraph for Node.js
+TODO: update paragraph to maybe make langchain.js sound better
 
-You'll create a new Java AI service that generates emails based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face models, or Ollama, with the following key features and benefits:
+You'll create a new Node.js AI service that generates emails based on https://nodejs.org[Node.js^] and the https://js.langchain.com/docs/introduction/[langchain.js^] library.  Langchain.js is a framework for developing applications powered by language models. It enables applications that:
 
-* *Key Features*
-** *Declarative AI Services*: Define how you want to interact with the LLM using annotations or configuration files.
-** *Embedding Support*: Integrates with document embedding stores like Redis, Chroma, or Infinispan to store and retrieve document context for the LLM.
-** *Observability Integration*: Allows monitoring and logging of LLM interactions within your Quarkus application.
-** *Pluggable Authentication*: Supports different authentication providers for accessing LLM services.
 
-* *Benefits*
-** *Simplified LLM Integration*: The extension streamlines the process of incorporating LLMs into your application, saving development time and effort.
-** *Declarative Approach*: It offers a declarative way to interact with LLMs, making the code more readable and maintainable. You specify what you want the LLM to do, and the extension handles the underlying communication.
-** *Embedding Support*: Supports Diverse LLMs: The extension is designed to work with a variety of LLM providers, giving you flexibility in choosing the LLM that best suits your needs.
+** Are context-aware: connect a language model to sources of context (prompt instructions, few shot examples, content to ground its response in, etc.)
+** Reason: rely on a language model to reason (about how to answer based on provided context, what actions to take, etc.)
+
+// You'll create a new Java AI service that generates emails based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face models, or Ollama, with the following key features and benefits:
+
+// * *Key Features*
+// ** *Declarative AI Services*: Define how you want to interact with the LLM using annotations or configuration files.
+// ** *Embedding Support*: Integrates with document embedding stores like Redis, Chroma, or Infinispan to store and retrieve document context for the LLM.
+// ** *Observability Integration*: Allows monitoring and logging of LLM interactions within your Quarkus application.
+// ** *Pluggable Authentication*: Supports different authentication providers for accessing LLM services.
+
+// * *Benefits*
+// ** *Simplified LLM Integration*: The library streamlines the process of incorporating LLMs into your application, saving development time and effort.
+// ** *Declarative Approach*: It offers a declarative way to interact with LLMs, making the code more readable and maintainable. You specify what you want the LLM to do, and the extension handles the underlying communication.
+// ** *Embedding Support*: Supports Diverse LLMs: The extension is designed to work with a variety of LLM providers, giving you flexibility in choosing the LLM that best suits your needs.
 
 END TODO: update paragraph for Node.js
 
@@ -63,35 +69,42 @@ git checkout -b new-gen-ai-service
 
 TODO: start here for NOde.js code changes
 
-Before you start coding, you need to start with the *Quarkus Dev Mode* that is a powerful feature to significantly speed up the development lifecycle of Quarkus applications. It provides hot reload capabilitiesn (Live Coding), allowing you to see the results of your code changes instantly without requiring a full application restart.
+TODO: Make sure we have the zod dep
 
-Run the following command in the VS Code terminal to start Quarkus Dev Mode.
+Before you starting coding, you will need to install the applications dependencies and build the webui.  These include libraries like https://fastify.dev/[Fastify^] and https://js.langchain.com/docs/introduction/[Langchain.js^].
+
+Run the following command in the VS Code terminal to install the applications dependencies.
 
 [.console-input]
 [source,bash,subs="+attributes,macros+"]
 ----
-./mvnw clean quarkus:dev
+npm install && npm run buildui
 ----
 
-The output should look similar to the following (wait for the ASCII art!):
+We also installed https://nodemon.io/[Nodemon^].  Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for development.  We will start our application with this utility.
+
+Run the following command in the VS Code terminal to start the application in Dev Mode.
+
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npx nodemon
+----
+
+The output should look similar to the following.
 
 [.console-output]
 [source,bash]
 ----
-....
- --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
- -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
---\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-INFO  [io.quarkus] (Quarkus Main Thread) insurance-app 1.0.0-SNAPSHOT on JVM (powered by Quarkus xx.xx.xx) started in 19.615s. Listening on: http://0.0.0.0:8080
-INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, langchain4j, langchain4j-ollama, langchain4j-openai, langchain4j-websockets-next, narayana-jta, quinoa, qute, rest, rest-client, rest-client-jackson, rest-jackson, smallrye-context-propagation, vertx, websockets-next]
+[nodemon] 3.1.9
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,cjs,json
+[nodemon] starting `node server.mjs`
 
---
-Tests paused
-Press [e] to edit command line args (currently ''), [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
 ----
 
-Validate your local Parasol application against the production version by accessing the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[Parasol web page^] (it may take up to a minute to come up - wait for the "Listening on..." message as shown above).
+Validate your local Parasol application against the production version by accessing the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[Parasol web page^].
 
 image::devhub/parasol_ui_web.png[]
 
@@ -99,150 +112,124 @@ image::devhub/parasol_ui_web.png[]
 
 To add the new feature, you will either create or edit the following files. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
 
-* `src/main/java/org/parasol/model/Email.java` - A Java record defining an incoming email from a customer
-* `src/main/java/org/parasol/model/EmailResponse.java` - A Java record defining a response (subject+message)
-* `src/main/java/org/parasol/ai/EmailService.java` - interface for interacting with the underlying LLM
-* `src/main/java/org/parasol/resources/EmailResource.java` - A REST-like web frontend interface
-* `src/main/resources/application.properties` - The Quarkus configuration where you'll define the parameters for connecting to the LLM inference service
-* `src/main/webui/src/app/components/EmailGenerate/EmailGenerate.tsx` - A React web component providing a simple interface for providing a customer email
-* `src/main/webui/src/app/routes.tsx` - A list of React routes to which you'll add the new Email generator component
+* `ai/email.mjs` - interface for interacting with the underlying LLM
+* `routes/email-route.mjs` - A REST endpoint to interface with the email generator
+* `webui/src/app/components/EmailGenerate/EmailGenerate.tsx` - A React web component providing a simple interface for providing a customer email
+* `webui/src/app/routes.tsx` - A list of React routes to which you'll add the new Email generator component
 
-==== Create Java records beans
+==== Create The Node.js AI Service
 
-Create a new Java record, `Email.java` in the `src/main/java/org/parasol/model` folder to carry email data in a concise and immutable way.
+Create a new file, `email.mjs` in the `ai` folder to serve as the AI Service connection point between your application and the LLM.  Copy the following code and paste it into the `email.mjs` file.
 
-To create this file, right-click on the `model` folder in the file tree, then select "New File..." and enter the name of the new file `Email.java`. The empty file will open.
+To create this file, right-click on the `ai` folder in the file tree, then select "New File..." and enter the name of the new file `email.mjs`. The empty file will open.
+
+TODO: update image
 
 image::devhub/new-file.png[new-file, 500]
 
 Copy the following code and paste it into the content editor.
 
 [.console-input]
-[source,java,subs="+attributes,macros+"]
+[source,javascript,subs="+attributes,macros+"]
 ----
-package org.parasol.model;
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { StructuredOutputParser } from 'langchain/output_parsers';
+import { z } from 'zod';
 
-public record Email(String text) { }
+export async function createChainAndAskQuestion(model, userResponse) {
+  ////////////////////////////////
+  // CREATE CHAIN
+  const prompt = ChatPromptTemplate.fromTemplate(`<1>
+      You are a helpful, respectful and honest assistant named Parasol Assistant.
+      You work for Parasol Insurance
+      Formatting Instructions: {format_instructions}
+      User Input: {input}
+  `);
+
+  // Setup the output parser using the Zod Schema
+  const outputParser = StructuredOutputParser.fromZodSchema(<2>
+    z.object({
+      subject: z.string().describe('Subject of your response, suitable to use as an email subject line.'),
+      message: z.string().describe('Response text that summarizes the information they gave, and asks for any other missing information needed from Parasol.')
+    })
+  );
+
+  const chain = prompt.pipe(model).pipe(outputParser);<3>
+
+  return await chain.invoke({<4>
+    input: userResponse,
+    format_instructions: outputParser.getFormatInstructions()
+  });
+}
 ----
+
+<1> What is this template thing
+<2> what is this ZodSchema Structured Output parser thing
+<3> What is this
+<4> what is this
 
 [NOTE]
 ====
 Where is the Save button? VS Code will autosave your changes, that is why you can’t find a SAVE button - no more losing code because you forgot to save. You can undo with *CTRL-Z* (or *CMD-Z* on a Mac) or by using the `Edit -> Undo` menu option.
 ====
 
-Next, create a new Java record, `EmailResponse.java` in the `src/main/java/org/parasol/model` folder to store the response from the LLM. Copy the following code and paste it into the `EmailResponse.java` file.
+==== Create Fastify REST resource
+
+Create a new Node.js file, `email-route.mjs` in the `routes` folder to serve a new REST endpoint. Copy the following code and paste it into the `email-route.mjs` file.
 
 [.console-input]
-[source,java,subs="+attributes,macros+"]
+[source,javascript,subs="+attributes,macros+"]
 ----
-package org.parasol.model;
+import { getModel } from '../ai/ai.mjs';
+import { createChainAndAskQuestion } from '../ai/email.mjs';
 
-public record EmailResponse(String subject, String message) { }
-----
-
-==== Create Java AI service
-
-Create a new Java file, `EmailService.java` in the `src/main/java/org/parasol/ai` folder to serve as the AI Service connection point between your application and the LLM. Copy the following code and paste it into the `EmailService.java` file.
-
-[.console-input]
-[source,java,subs="+attributes,macros+"]
-----
-package org.parasol.ai;
-
-import org.parasol.model.EmailResponse;
-
-import dev.langchain4j.service.SystemMessage;
-import dev.langchain4j.service.UserMessage;
-import io.quarkiverse.langchain4j.RegisterAiService;
-
-@RegisterAiService(modelName = "parasol-email")<1>
-public interface EmailService {
-    @SystemMessage("""<2>
-      You are a helpful, respectful and honest assistant named "Parasol Assistant".
-
-      You are responding to customer emails. Provide a friendly response that is written by Parasol. The response should thank them for being a customer. Include information about when parasol insurance was founded.
-
-      Your response must look like the following JSON:
-
-      {
-        "subject": [A good one-line greeting],
-        "message": [Your response, summarizing the information they gave and ask the customer for any follow-up information needed to file a claim]
-      }
-      """)
-    EmailResponse chat(@UserMessage String claim);<3>
+async function emailRoute(fastify, options) {
+  fastify.post('/api/email', async (request, reply) => {<1>
+    // AI Related Setup
+    const model = getModel();
+    // Create the chain and Ask the question
+    const answer = await createChainAndAskQuestion(model, request.body.text);
+    // Return the results
+    return {
+      subject: answer.subject,
+      message: answer.message
+    };
+  });
 }
+
+export default emailRoute;
+
 ----
-<1> `@RegisterAiService` annotation is pivotal for registering the AI Service, represented as a Java interface.
-<2> `@SystemMessage` annotation defines the scope and initial instructions, serving as the first message sent to the LLM. It delineates the AI service's role in the interaction.
-<3> `@UserMessage` annotation defines primary instructions dispatched to the LLM. It typically encompasses requests and the expected response format.
-
-==== Create Jakarta REST resource
-
-Create a new Java file, `EmailResource.java` in the `src/main/java/org/parasol/resources` folder to serve a new REST endpoint. Copy the following code and paste it into the `EmailResource.java` file.
-
-[.console-input]
-[source,java,subs="+attributes,macros+"]
-----
-package org.parasol.resources;
-
-import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
-import org.parasol.ai.EmailService;
-import org.parasol.model.Email;
-import org.parasol.model.EmailResponse;
-
-@Produces(MediaType.APPLICATION_JSON)
-@Path("/api/email") // <1>
-public class EmailResource {
-
-    @Inject
-    EmailService bot;
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public EmailResponse getresponse(Email claimEmail) {
-        return bot.chat(claimEmail.text());
-    }
-}
-----
-<1> *@Path* annotation defines the URL path for the resource.
-
-==== Add new LLM model configurations
-
-Open the existing `application.properties` file in the `src/main/resources` folder to append the following Langchain4j configuration values.
-
-[.console-input]
-[source,properties,subs="+attributes,macros+"]
-----
-quarkus.langchain4j.parasol-email.chat-model.provider=openai<1>
-quarkus.langchain4j.openai.parasol-email.chat-model.temperature=0.3<2>
-quarkus.langchain4j.openai.parasol-email.timeout=600s<3>
-quarkus.langchain4j.openai.parasol-email.chat-model.model-name=parasol-instruct<4>
-quarkus.langchain4j.openai.parasol-email.base-url=http://parasol-instruct-predictor.aiworkshop.svc.cluster.local:8080/v1<5>
-----
-<1> Specify the model provider (e.g., openai, huggingface). Note that you use the Open AI API specification when you connect to the LLM (parasol-instruct) inference endpoint
-<2> Set the model temperature. Temperature is a parameter used in natural language processing models to increase or decrease the “confidence” a model has in its most likely response
-<3> Specify the timeout between question and response in the LLM
-<4> Specify the model name to connect to
-<5> Specify the base URL of the LLM inference endpoint that the application will connect to
+<1> defines the URL path for the resource.
 
 
-TODO: start here for NOde.js code changes
+// Probably don't need any LLM model config updates, but not sure.  either way, it won't be this file
+//==== Add new LLM model configurations
+
+// Open the existing `application.properties` file in the `src/main/resources` folder to append the following Langchain4j configuration values.
+
+// [.console-input]
+// [source,properties,subs="+attributes,macros+"]
+// ----
+// quarkus.langchain4j.parasol-email.chat-model.provider=openai<1>
+// quarkus.langchain4j.openai.parasol-email.chat-model.temperature=0.3<2>
+// quarkus.langchain4j.openai.parasol-email.timeout=600s<3>
+// quarkus.langchain4j.openai.parasol-email.chat-model.model-name=parasol-instruct<4>
+// quarkus.langchain4j.openai.parasol-email.base-url=http://parasol-instruct-predictor.aiworkshop.svc.cluster.local:8080/v1<5>
+// ----
+// <1> Specify the model provider (e.g., openai, huggingface). Note that you use the Open AI API specification when you connect to the LLM (parasol-instruct) inference endpoint
+// <2> Set the model temperature. Temperature is a parameter used in natural language processing models to increase or decrease the “confidence” a model has in its most likely response
+// <3> Specify the timeout between question and response in the LLM
+// <4> Specify the model name to connect to
+// <5> Specify the base URL of the LLM inference endpoint that the application will connect to
 
 === Update the frontend web application in Parasol Insurance
-
-TODO: THis is the front-end, so no Quarkus stuff here, but where will the front-end live?  directory structure might be different based on location
 
 Let's update the frontend React web application to give our customer service reps a nice interface for generating emails.
 
 ==== Create new React TypeScript component
 
-Create a new `EmailGenerate` folder in the `src/main/webui/src/app/components` folder. Also, create a new TypeScript XML file, `EmailGenerate.tsx` in the `src/main/webui/src/app/components/EmailGenerate` folder to render the output of the LLM in the email subject and body content. Copy the following code and paste it into the EmailGenerate.tsx file.
+Create a new `EmailGenerate` folder in the `webui/src/app/components` folder. Also, create a new TypeScript XML file, `EmailGenerate.tsx` in the `webui/src/app/components/EmailGenerate` folder to render the output of the LLM in the email subject and body content. Copy the following code and paste it into the EmailGenerate.tsx file.
 
 [.console-input]
 [source,javascript,subs="+attributes,macros+"]
@@ -335,7 +322,7 @@ This interface allows customer service representatives to copy and paste the cus
 
 ==== Add a new menu item in the navigation bar
 
-Open the `routes.tsx` file in the `src/main/webui/src/app` folder and `uncomment` the following code out in line *8* and *89 - 95* to show the new menu item.
+Open the `routes.tsx` file in the `webui/src/app` folder and `uncomment` the following code out in line *8* and *89 - 95* to show the new menu item.
 
 [NOTE]
 ====
@@ -362,9 +349,9 @@ import { EmailGenerate } from './components/EmailGenerate/EmailGenerate';
 
 ==== Local test the new feature
 
-TODO: update for Node.js local testing
+TODO: update for Node.js local testing and instructions for building the Webui again.  maybe this is part of the nodemon run?
 
-Before committing, do a quick functional test locally to ensure you got all the changes correct. If you stopped the Quarkus dev mode, start it again.
+Before committing, do a quick functional test locally to ensure you got all the changes correct. If you stopped the Nodemon process, start it again.
 
 Reload the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[Parasol web page^].
 
@@ -413,6 +400,8 @@ Click on `Submit` to generate the email subject and body. It will take a few sec
 image::devhub/generated_email.png[]
 
 *Great!* Now you're ready to merge this code into the application. We'll create a pull request which will automatically build the new app so that we can test it.
+
+** TODO: This whole next section needs the environment to test and figure out
 
 == Create a new pull request
 
@@ -542,6 +531,8 @@ Click on `Submit` to generate the email subject and body. It will take a few sec
 image::devhub/generated_email.png[]
 
 You've confirmed what the new Email feature in the Parasol application look like and how it works. Notice that this email includes specific details that Parasol needs, since we are using the fine-tuned model with Parasol-proprietary policy information! This will help our customer service reps in their interactions with customers.
+
+** TODO: This whole next section needs the environment to test and figure out
 
 == Conclusion
 
