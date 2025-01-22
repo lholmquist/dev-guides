@@ -36,19 +36,6 @@ You'll create a new Node.js AI service that generates emails based on https://no
 ** Are context-aware: connect a language model to sources of context (prompt instructions, few shot examples, content to ground its response in, etc.)
 ** Reason: rely on a language model to reason (about how to answer based on provided context, what actions to take, etc.)
 
-// You'll create a new Java AI service that generates emails based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face models, or Ollama, with the following key features and benefits:
-
-// * *Key Features*
-// ** *Declarative AI Services*: Define how you want to interact with the LLM using annotations or configuration files.
-// ** *Embedding Support*: Integrates with document embedding stores like Redis, Chroma, or Infinispan to store and retrieve document context for the LLM.
-// ** *Observability Integration*: Allows monitoring and logging of LLM interactions within your Quarkus application.
-// ** *Pluggable Authentication*: Supports different authentication providers for accessing LLM services.
-
-// * *Benefits*
-// ** *Simplified LLM Integration*: The library streamlines the process of incorporating LLMs into your application, saving development time and effort.
-// ** *Declarative Approach*: It offers a declarative way to interact with LLMs, making the code more readable and maintainable. You specify what you want the LLM to do, and the extension handles the underlying communication.
-// ** *Embedding Support*: Supports Diverse LLMs: The extension is designed to work with a variety of LLM providers, giving you flexibility in choosing the LLM that best suits your needs.
-
 END TODO: update paragraph for Node.js
 
 ==== Create a new branch in Gitlab
@@ -67,13 +54,9 @@ git checkout -b new-gen-ai-service
 
 ==== Get started with live coding
 
-TODO: start here for NOde.js code changes
-
-TODO: Make sure we have the zod dep
-
 Before you starting coding, you will need to install the applications dependencies and build the webui.  These include libraries like https://fastify.dev/[Fastify^] and https://js.langchain.com/docs/introduction/[Langchain.js^].
 
-Run the following command in the VS Code terminal to install the applications dependencies.
+Run the following command in the VS Code terminal to install the applications dependencies and build the webui.
 
 [.console-input]
 [source,bash,subs="+attributes,macros+"]
@@ -110,12 +93,13 @@ image::devhub/parasol_ui_web.png[]
 
 ==== Preview the changes you need to make
 
-To add the new feature, you will either create or edit the following files. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
+To add the new feature, you will either create or edit the following files.  You will also add a new dependency to the package.json. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
 
 * `ai/email.mjs` - interface for interacting with the underlying LLM
 * `routes/email-route.mjs` - A REST endpoint to interface with the email generator
 * `webui/src/app/components/EmailGenerate/EmailGenerate.tsx` - A React web component providing a simple interface for providing a customer email
 * `webui/src/app/routes.tsx` - A list of React routes to which you'll add the new Email generator component
+* `package.json` - Important information about the application, like which dependencies to install
 
 ==== Create The Node.js AI Service
 
@@ -172,6 +156,38 @@ export async function createChainAndAskQuestion(model, userResponse) {
 ====
 Where is the Save button? VS Code will autosave your changes, that is why you can’t find a SAVE button - no more losing code because you forgot to save. You can undo with *CTRL-Z* (or *CMD-Z* on a Mac) or by using the `Edit -> Undo` menu option.
 ====
+
+==== Install the Zod node module
+
+In the above code, we created a schema to define what our output parser should look like.  It uses a popular schema validation module called https://zod.dev/[Zod^].  To use its capabilities, it needs to be installed and added to our package.json.
+
+Run the following command in the VS Code terminal to install this new dependency and update the package.json
+
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npm install zod
+----
+
+The update dependencies section of the package.json should look similar:
+
+[.console-input]
+[source,json,subs="+attributes,macros+"]
+----
+  "dependencies": {
+    "@fastify/env": "^4.4.0",
+    "@fastify/static": "^7.0.4",
+    "@fastify/websocket": "^10.0.1",
+    "@langchain/core": "^0.2.27",
+    "fastify": "^4.28.1",
+    "fastify-plugin": "^4.5.1",
+    "langchain": "^0.2.16",
+    "sqlite3": "^5.1.7",
+    "zod": "^3.23.8" <1>
+  },
+----
+
+<1> - The newly added module
 
 ==== Create Fastify REST resource
 
@@ -401,7 +417,7 @@ image::devhub/generated_email.png[]
 
 *Great!* Now you're ready to merge this code into the application. We'll create a pull request which will automatically build the new app so that we can test it.
 
-** TODO: This whole next section needs the environment to test and figure out
+* TODO: This whole next section needs the environment to test and figure out
 
 == Create a new pull request
 
@@ -484,7 +500,7 @@ image::devhub/frontend_newpipeline.png[]
 
 == Verify the new app's functionality
 
-Reload the https://parasol-app-{user}-dev-parasol-app-{user}-dev.{openshift_cluster_ingress_domain}[Parasol web page^] in `production` to verify everything is working as expected. Ensure *not to reload the local page* when you were testing using Quarkus dev mode.
+Reload the https://parasol-app-{user}-dev-parasol-app-{user}-dev.{openshift_cluster_ingress_domain}[Parasol web page^] in `production` to verify everything is working as expected. Ensure *not to reload the local page* when you were testing using Nodemon.
 
 [NOTE]
 ====
@@ -532,7 +548,7 @@ image::devhub/generated_email.png[]
 
 You've confirmed what the new Email feature in the Parasol application look like and how it works. Notice that this email includes specific details that Parasol needs, since we are using the fine-tuned model with Parasol-proprietary policy information! This will help our customer service reps in their interactions with customers.
 
-** TODO: This whole next section needs the environment to test and figure out
+* END TODO: This whole next section needs the environment to test and figure out
 
 == Conclusion
 
