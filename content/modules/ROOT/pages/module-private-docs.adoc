@@ -210,8 +210,6 @@ To add the new RAG feature, you will either create or edit the following files. 
 * `ai/rag.mjs` - RAG related setup
 * `ai/chatbot.mjs` - interface for interacting with the LLM
 
-TODO: URL will need updating once we are in the system
-
 We have already added a policy document (`policy-info.pdf`) in the `resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/resources/policies/policy-info.pdf[Click here^] to view it.
 
 Create a new file, `rag.mjs` in the `ai` folder.  Copy the following code and paste it into the `rag.mjs` file.
@@ -282,11 +280,59 @@ TODO: rag.mjs Code Walk through
 
 TODO: chat.mjs Code updates
 
-TODO: mention that all the vector stuff could be done "offline" but we do it each time we instantiate a new chat for demo purposes
+We next need to make a couple small updates to our existing chatbot.
 
-That's all there is to it! When Quarkus restarts it will read the `src/main/resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
+We first need to import the newly created `rag.mjs` file to use its exported function, `createRagRetrieverChain`.
 
-Reload the browser window to make sure Quarkus Dev mode picks up the changes.
+Open the `chatbot.mjs` file in the `ai` folder and add the following to the first top of the file.
+
+[.console-output]
+[source,javascript]
+----
+import createRagRetrieverChain from './rag.mjs';
+----
+
+Next, we will need to update the prompt to allow for the new RAG context to be injected.
+
+Replace the `system` prompt tuple entry with the following code:
+
+[.console-output]
+[source,javascript]
+----
+[ 'system',
+      'You are a helpful, respectful and honest assistant named "Parasol Assistant".' +
+      'You will be given a claim summary, references to provide you with information, and a question. You must answer the question based as much as possible on this claim with the help of the references.' +
+      'Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.' +
+      'If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\'t know the answer to a question, please don\'t share false information.' +
+      'You must answer in 4 sentences or less.' +
+      'Don\'t make up policy term limits by yourself' +
+      'Context: {context}'
+    ],
+----
+
+Notice that the only difference is that last line, `Context: {context}`.  This placeholder tells Langchain.js where to inject any new information we retrieve from our RAG vector store.
+
+Next, we need to use our newly created function that we just imported.  Replace the line `const chain = prompt.pipe(model);` with the following:
+
+[.console-output]
+[source,javascript]
+----
+const chain = await createRagRetrieverChain(model, prompt);
+----
+
+TODO: mention something that we are just using a differnt type of runnable, but it's still a chain that can be used
+
+Lastly, add the following key/value pair to the object passed to the `RunnableWithMessageHistory` function.  This should be added directly after the `inputMessagesKey` parameter:
+
+[.console-output]
+[source,javascript]
+----
+outputMessagesKey: 'answer',
+----
+
+TODO: mention something related to the output key is different for this type of runnable
+
+That's all there is to it!  Each time we start a new chat session, our RAG code will read the `resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
 
 Now ask the same question in the chat window:
 
