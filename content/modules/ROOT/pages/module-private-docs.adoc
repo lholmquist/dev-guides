@@ -201,7 +201,7 @@ TIP: See the xref:module-ilab.adoc[AI Model Fine-Tuning module,window=_blank] fo
 
 START TODO: update for Node.js .
 
-While we could use a https://www.ibm.com/topics/vector-database[vector database^] to store vectorized data to use with RAG, we can also simply specify a directory where text-based files are stored. We can then parse this data, retrieve similar data, vectorize it, and pass it along to our LLM calls. We will create a new file called `rag.mjs` that will used to setup all our RAG related code.
+While we could use a https://www.ibm.com/topics/vector-database[vector database^] to store vectorized data to use with RAG, we can also simply specify a directory where text-based files are stored. We can then parse this data, retrieve similar data, vectorize it, and pass it along to our LLM calls. We will create a new file called `rag.mjs` that will used to setup all our RAG related code.  We will also make a small update to our existing `chatbot.mjs` file to use our new RAG code.
 
 ==== Preview the changes you need to make
 
@@ -214,10 +214,75 @@ TODO: URL will need updating once we are in the system
 
 We have already added a policy document (`policy-info.pdf`) in the `resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/resources/policies/policy-info.pdf[Click here^] to view it.
 
+Create a new file, `rag.mjs` in the `ai` folder.  Copy the following code and paste it into the `rag.mjs` file.
+
+To create this file, right-click on the `ai` folder in the file tree, then select "New File..." and enter the name of the new file `rag.mjs`. The empty file will open.
+
+Copy the following code and paste it into the content editor.
+
+[.console-input]
+[source,javascript,subs="+attributes,macros+"]
+----
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import {HuggingFaceTransformersEmbeddings} from '@langchain/community/embeddings/hf_transformers';
+import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
+import { createRetrievalChain } from 'langchain/chains/retrieval';
+
+export default async function createRagRetrieverChain(model, prompt) {
+  // Parse Docs
+  const loader = new PDFLoader(path.join(__dirname, '../', 'resources', 'policies', 'policy-info.pdf'));
+  const docs = await loader.load(); <1>
+
+  // Split them
+  const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 200,
+    chunkOverlap: 20
+  });
+  const splits = await textSplitter.splitDocuments(docs); <2>
+
+  // Instantiate Embeddings function
+  const embeddings = new HuggingFaceTransformersEmbeddings();
+
+  const vectorStore = await MemoryVectorStore.fromDocuments( <3>
+    splits,
+    embeddings
+  );
+
+  const retriever = vectorStore.asRetriever();
+
+  const ragChain = await createStuffDocumentsChain({ <4>
+    llm: model,
+    prompt
+  });
+
+  const retrievalChain = await createRetrievalChain({ <5>
+    combineDocsChain: ragChain,
+    retriever
+  });
+
+  return retrievalChain;
+}
+----
+
+<1> What is this template thing
+<2> what is this ZodSchema Structured Output parser thing
+<3> What is this
+<4> what is this
+<5> what is this
+
 
 TODO: rag.mjs Code Walk through
 
-TODO: maybe move the "offline" rag parts to only happen once,  or just mention that you could do it different and this only for demo purposes?
+TODO: chat.mjs Code updates
+
+TODO: mention that all the vector stuff could be done "offline" but we do it each time we instantiate a new chat for demo purposes
 
 That's all there is to it! When Quarkus restarts it will read the `src/main/resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
 
