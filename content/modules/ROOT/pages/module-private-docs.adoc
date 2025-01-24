@@ -41,16 +41,13 @@ https://developers.redhat.com/products/openshift-dev-spaces/overview[Red Hat Ope
 
 TODO: needs an update for Node.js
 
-=== Using LangChain4j with Quarkus
+=== Using LangChain.js with Node.js
 
-You'll be building new features in this application, based on https://developers.redhat.com/products/quarkus/overview[Quarkus^] and the https://github.com/langchain4j/langchain4j[LangChain4j^] library. The https://quarkus.io/extensions/?search-regex=langchain[Quarkus LangChain4j extensions^] bridge the gap between your Quarkus application and LangChain4j, a library that allows interaction with various LLMs like OpenAI, Hugging Face, or Ollama. It has the following key features and benefits:
+You'll create a new Node.js AI service that generates emails based on https://nodejs.org[Node.js^] and the https://js.langchain.com/docs/introduction/[langchain.js^] library.  Langchain.js is a framework for developing applications powered by language models. It enables applications that:
 
-** *Simplified LLM Integration*: The extension streamlines the process of incorporating LLMs into your application, saving development time and effort.
-** *Declarative AI Services*: Defines how you want to interact with the LLM using annotations or configuration files.
-** *Embedding Support*: Integrates with document embedding stores like Redis, Chroma, or Infinispan to store and retrieve document context for the LLM.
-** *Observability Integration*: Allows monitoring and logging of LLM interactions within your Quarkus application.
 
-END TODO: needs an update for Node.js
+** Are context-aware: connect a language model to sources of context (prompt instructions, few shot examples, content to ground its response in, etc.)
+** Reason: rely on a language model to reason (about how to answer based on provided context, what actions to take, etc.)
 
 include::partial-revert-devspaces-workspace.adoc[]
 
@@ -58,26 +55,34 @@ include::partial-revert-devspaces-workspace.adoc[]
 
 START TODO: update for Node.js .
 
-This Quarkus application is a customer service processing tool that handles customer claim emails for Parasol insurance. The team has recently improved the application with a chatbot to interact with the agent and to generate responses based on the email content. In the VS Code environment, navigate to the `src/main/java/org/parasol` directory, which contains the main source code of the application.
+This Node.js application is a customer service processing tool that handles customer claim emails for Parasol insurance. The team has recently improved the application with a chatbot to interact with the agent and to generate responses based on the email content. In the VS Code environment, navigate to the root directory, which contains the main source code of the application.
 
 image::private-docs/quarkus-codebase.png[Quarkus codebase]
 
-In the `src/main/java/org/parasol/ai/ClaimService.java` file, you'll find the main AI chatbot class that processes the customer claim emails with a `@SystemMessage` and `@UserMessage` annotation, and a `chat` method. The `chat` method processes the claim details and question, then generates a response based on the claim and references provided.
+TODO: UPDATE HERE
+In the `ai/chatbot.mjs` file, you'll find all the relevant code for creating a AI Chatbot that processes the customer claim emails.  This code creates a prompt using both System and Human messages, while also providing a `chat` function.  The `chat` function processes the claim details and question, then generates a response based on the claim and references provided.
 
+TODO: depends on if we create something for the module-prompt stuff
 TIP: If you're unfamiliar with what a system or user message is, you might want to read through the xref:module-prompt.adoc[Prompting Basics,window=_blank] module first.
 
-.src/main/java/org/parasol/ai/ClaimService.java
-[source,java,subs="+attributes,macros+"]
+TODO: this include will need to be updated once we have the ai-llm-template, for now, using our nodeshift parasol-nodejs repo
+
+.ai/chatbot.mjs
+[source,javascript,subs="+attributes,macros+"]
 ----
-include::https://raw.githubusercontent.com/rh-rad-ai-roadshow/ai-llm-template/main/scaffolder-templates/parasol-java-template/skeleton/src/main/java/org/parasol/ai/ClaimService.java[]
+include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/ai/chatbot.mjs[]
 ----
 
-You can also explore the `src/main/resources/application.properties` file to review the application configuration, including the Quarkus configuration and the LangChain4j extension settings.
+You can also explore the `.env` file to review the application configuration, including any AI related settings.
 
-.src/main/resources/application.properties
+NOTE: It is usually not recommended to keep your `.env` in source control, however, it is included as part of this roadshow to demonstrate setting the applications properties
+
+TODO: this include will need to be updated once we have the ai-llm-template, for now, using our nodeshift parasol-nodejs repo
+
+..env
 [source,properties,subs="+attributes,macros+"]
 ----
-include::https://raw.githubusercontent.com/rh-rad-ai-roadshow/ai-llm-template/main/scaffolder-templates/parasol-java-template/skeleton/src/main/resources/application.properties[]
+include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/.env[]
 ----
 
 NOTE: The application is currently configured to be able to communicate with either an https://platform.openai.com/docs/api-reference/introduction[OpenAI-compliant^] or an https://github.com/ollama/ollama/blob/main/docs/api.md[Ollama-compliant^] endpoint. More on that later!
@@ -86,23 +91,41 @@ NOTE: The application is currently configured to be able to communicate with eit
 
 Now that we've checked out the chatbot code and gotten to a clean state, let's test it locally.
 
-In the terminal window that you opened earlier at the bottom of the editor, run the following command:
+In the terminal window that you opened earlier at the bottom of the editor, run the following command to install the Application dependecies and build the webui:
 
 [.console-input]
 [source,bash,subs="+attributes,macros+"]
 ----
-./mvnw clean quarkus:dev -Dquarkus.otel.enabled=true -Dquarkus.otel.exporter.otlp.traces.endpoint=http://jaeger.parasol-app-{user}-dev.svc.cluster.local:4317
+npm install && npm run buildui
 ----
 
-This will download some dependencies and start the application in Quarkus Dev Mode.
+We also installed https://nodemon.io/[Nodemon^].  Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for development.  We will start our application with this utility.
 
-NOTE: You may get asked to contribute anonymous build time data. It's up to you what to answer, but we recommend answering yes so the Quarkus developers can have valuable performance insights to improve Quarkus even further.
+Run the following command in the VS Code terminal to start the application in Dev Mode.
 
-After a minute or 2, depending on network speeds, your application will be up and running:
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npx nodemon
+----
+
+
+The output should look similar to the following.
+
+[.console-output]
+[source,bash]
+----
+[nodemon] 3.1.9
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,cjs,json
+[nodemon] starting `node server.mjs`
+
+----
 
 image::private-docs/quarkus-dev.png[Quarkus dev]
 
-Go ahead and click the **Open In New Tab** button that shows up in the bottom right
+NEEDS UPDATE: Go ahead and click the **Open In New Tab** button that shows up in the bottom right
 
 END TODO: update for Node.js .
 
@@ -178,62 +201,23 @@ TIP: See the xref:module-ilab.adoc[AI Model Fine-Tuning module,window=_blank] fo
 
 START TODO: update for Node.js .
 
-While we could use a https://www.ibm.com/topics/vector-database[vector database^] to store vectorized data to use with RAG, we can also simply specify a directory where text-based files are stored. We can then parse this data, retrieve similar data, vectorize it, and pass it along to our LLM calls. This process is made very easy with the aptly named https://docs.quarkiverse.io/quarkus-langchain4j/dev/easy-rag.html["Easy RAG" extension in Quarkus^].
+While we could use a https://www.ibm.com/topics/vector-database[vector database^] to store vectorized data to use with RAG, we can also simply specify a directory where text-based files are stored. We can then parse this data, retrieve similar data, vectorize it, and pass it along to our LLM calls. We will create a new file called `rag.mjs` that will used to setup all our RAG related code.
 
-Return to Dev Spaces and open a new terminal window as you did before (click on the **hamburger** menu button in the top left, then click on **Terminal** and finally on **New Terminal**), or click the **+** button on the top-right of your current terminal.
+==== Preview the changes you need to make
 
-image::private-docs/open-new-terminal.png[]
+To add the new RAG feature, you will either create or edit the following files. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
 
-In the new terminal, add this extension by running the following command:
+* `ai/rag.mjs` - RAG related setup
+* `ai/chatbot.mjs` - interface for interacting with the LLM
 
-[.console-input]
-[source,bash,subs="+attributes,macros+"]
-----
-./mvnw quarkus:add-extension -Dextension="io.quarkiverse.langchain4j:quarkus-langchain4j-easy-rag:\${quarkus.langchain4j.version}"
-----
+TODO: URL will need updating once we are in the system
 
-You will see that a new extension was added to your application:
+We have already added a policy document (`policy-info.pdf`) in the `resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/resources/policies/policy-info.pdf[Click here^] to view it.
 
-[.console-output]
-[source,java]
-----
-[INFO] Looking for the newly published extensions in registry.quarkus.io
-[INFO] [SUCCESS] ✅  Extension io.quarkiverse.langchain4j:quarkus-langchain4j-easy-rag:xx.xx.xx has been installed
-----
 
-[NOTE]
-====
-Dev Spaces may also ask if you would like to open the application again. This is because the Quarkus dev mode in your other terminal has restarted due to adding a new extension.
+TODO: rag.mjs Code Walk through
 
-Don't open the application again yet, we first need to add some configuration for the new extension.
-====
-
-[CAUTION]
-====
-You will most likely see errors if you open the application again (or return to the console the application is running in) before completing the following configuration. Please continue with the following configuration before reattempting to use the application.
-====
-
-We have already added a policy document (`policy-info.pdf`) in the `src/main/resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/src/main/resources/policies/policy-info.pdf[Click here^] to view it.
-
-We can tell the Easy Rag extension where to find it by adding the following lines in your `src/main/resources/application.properties`:
-
-[.console-input]
-[source,properties,subs="+attributes,macros+"]
-----
-# RAG
-quarkus.langchain4j.embedding-model.provider=openai<1>
-quarkus.langchain4j.easy-rag.path=src/main/resources/policies<2>
-quarkus.langchain4j.easy-rag.reuse-embeddings.enabled=true<3>
-quarkus.langchain4j.openai.base-url=http://parasol-embedding-predictor.aiworkshop.svc.cluster.local:8080/v1<4>
-quarkus.langchain4j.openai.embedding-model.model-name=parasol-embedding<5>
-----
-<1> Instructs Quarkus to use an OpenAI-compliant endpoint for computing embeddings
-<2> Path to the folder that contains the RAG documents
-<3> Reuse embeddings so when we restart the application it does not need to re-vectorize the documents
-<4> The URL to the embedding model server being to compute and search embeddings
-<5> The name of the embedding model being used to compute and search embeddings
-
-TIP: In production, these embeddings would most likely be pre-computed as part of an outer-loop pipeline and stored into a vector database that the application would read from.
+TODO: maybe move the "offline" rag parts to only happen once,  or just mention that you could do it different and this only for demo purposes?
 
 That's all there is to it! When Quarkus restarts it will read the `src/main/resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
 
