@@ -60,6 +60,7 @@ This Node.js application is a customer service processing tool that handles cust
 image::private-docs/quarkus-codebase.png[Quarkus codebase]
 
 TODO: UPDATE HERE
+TODO: a little sidebar on the concept of chains and runnables?
 In the `ai/chatbot.mjs` file, you'll find all the relevant code for creating a AI Chatbot that processes the customer claim emails.  This code creates a prompt using both System and Human messages, while also providing a `chat` function.  The `chat` function processes the claim details and question, then generates a response based on the claim and references provided.
 
 TODO: depends on if we create something for the module-prompt stuff
@@ -269,16 +270,11 @@ export default async function createRagRetrieverChain(model, prompt) {
 }
 ----
 
-<1> What is this template thing
-<2> what is this ZodSchema Structured Output parser thing
-<3> What is this
-<4> what is this
-<5> what is this
-
-
-TODO: rag.mjs Code Walk through
-
-TODO: chat.mjs Code updates
+<1> Load the policy pdf document
+<2> Split the pdf document into chunks
+<3> Store the document chunks and embeddings into an in-memory Vector Store
+<4> Create a chain that passes a list of documents to a model
+<5> Create a retrieval chain that retrieves documents and then passes them on
 
 We next need to make a couple small updates to our existing chatbot.
 
@@ -320,8 +316,6 @@ Next, we need to use our newly created function that we just imported.  Replace 
 const chain = await createRagRetrieverChain(model, prompt);
 ----
 
-TODO: mention something that we are just using a differnt type of runnable, but it's still a chain that can be used
-
 Lastly, add the following key/value pair to the object passed to the `RunnableWithMessageHistory` function.  This should be added directly after the `inputMessagesKey` parameter:
 
 [.console-output]
@@ -329,8 +323,6 @@ Lastly, add the following key/value pair to the object passed to the `RunnableWi
 ----
 outputMessagesKey: 'answer',
 ----
-
-TODO: mention something related to the output key is different for this type of runnable
 
 That's all there is to it!  Each time we start a new chat session, our RAG code will read the `resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
 

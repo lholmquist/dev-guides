@@ -147,10 +147,10 @@ export async function createChainAndAskQuestion(model, userResponse) {
 }
 ----
 
-<1> What is this template thing
-<2> what is this ZodSchema Structured Output parser thing
-<3> What is this
-<4> what is this
+<1> Create a prompt to inform our LLM what do to.
+<2> Define the schema for our Output Parser.
+<3> Combine the prompt, model and outparser to create a runnable chain
+<4> Run the chain we created to interact with the LLM
 
 [NOTE]
 ====
