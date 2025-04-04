@@ -61,29 +61,29 @@ image::private-docs/quarkus-codebase.png[Quarkus codebase]
 
 TODO: UPDATE HERE
 TODO: a little sidebar on the concept of chains and runnables?
-In the `ai/chatbot.mjs` file, you'll find all the relevant code for creating a AI Chatbot that processes the customer claim emails.  This code creates a prompt using both System and Human messages, while also providing a `chat` function.  The `chat` function processes the claim details and question, then generates a response based on the claim and references provided.
+In the `app/ai/chatbot.mjs` file, you'll find all the relevant code for creating a AI Chatbot that processes the customer claim emails.  This code creates a prompt using both System and Human messages, while also providing a `chat` function.  The `chat` function processes the claim details and question, then generates a response based on the claim and references provided.
 
 TODO: depends on if we create something for the module-prompt stuff
 TIP: If you're unfamiliar with what a system or user message is, you might want to read through the xref:module-prompt.adoc[Prompting Basics,window=_blank] module first.
 
 TODO: this include will need to be updated once we have the ai-llm-template, for now, using our nodeshift parasol-nodejs repo
 
-.ai/chatbot.mjs
+.app/ai/chatbot.mjs
 [source,javascript,subs="+attributes,macros+"]
 ----
-include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/ai/chatbot.mjs[]
+include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/app/ai/chatbot.mjs[]
 ----
 
-You can also explore the `.env` file to review the application configuration, including any AI related settings.
+You can also explore the `app/.env` file to review the application configuration, including any AI related settings.
 
 NOTE: It is usually not recommended to keep your `.env` in source control, however, it is included as part of this roadshow to demonstrate setting the applications properties
 
 TODO: this include will need to be updated once we have the ai-llm-template, for now, using our nodeshift parasol-nodejs repo
 
-..env
+.app/.env
 [source,properties,subs="+attributes,macros+"]
 ----
-include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/.env[]
+include::https://raw.githubusercontent.com/nodeshift/parasol-insurance-nodejs/refs/heads/main/app/.env[]
 ----
 
 NOTE: The application is currently configured to be able to communicate with either an https://platform.openai.com/docs/api-reference/introduction[OpenAI-compliant^] or an https://github.com/ollama/ollama/blob/main/docs/api.md[Ollama-compliant^] endpoint. More on that later!
@@ -92,12 +92,12 @@ NOTE: The application is currently configured to be able to communicate with eit
 
 Now that we've checked out the chatbot code and gotten to a clean state, let's test it locally.
 
-In the terminal window that you opened earlier at the bottom of the editor, run the following command to install the Application dependecies and build the webui:
+In the terminal window that you opened earlier at the bottom of the editor, run the following command to change to the application directoy, install the Application dependecies and build the webui:
 
 [.console-input]
 [source,bash,subs="+attributes,macros+"]
 ----
-npm install && npm run buildui
+cd app && npm install && npm run buildui
 ----
 
 We also installed https://nodemon.io/[Nodemon^].  Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for development.  We will start our application with this utility.
@@ -124,9 +124,9 @@ The output should look similar to the following.
 
 ----
 
-image::private-docs/quarkus-dev.png[Quarkus dev]
+image::private-docs/nodejs-dev.png[Node.js dev]
 
-NEEDS UPDATE: Go ahead and click the **Open In New Tab** button that shows up in the bottom right
+Go ahead and click the **Open In New Tab** button that shows up in the bottom right
 
 END TODO: update for Node.js .
 
@@ -208,14 +208,25 @@ While we could use a https://www.ibm.com/topics/vector-database[vector database^
 
 To add the new RAG feature, you will either create or edit the following files. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
 
-* `ai/rag.mjs` - RAG related setup
-* `ai/chatbot.mjs` - interface for interacting with the LLM
+* `app/ai/rag.mjs` - RAG related setup
+* `app/ai/chatbot.mjs` - interface for interacting with the LLM
+* `app/package.json` - Important information about the application, like which dependencies to install
 
-We have already added a policy document (`policy-info.pdf`) in the `resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/resources/policies/policy-info.pdf[Click here^] to view it.
+We have already added a policy document (`policy-info.pdf`) in the `app/resources/policies` folder. https://gitlab-gitlab.{openshift_cluster_ingress_domain}/development/parasol-app-{user}/-/blob/master/resources/app/policies/policy-info.pdf[Click here^] to view it.
 
-Create a new file, `rag.mjs` in the `ai` folder.  Copy the following code and paste it into the `rag.mjs` file.
+Before we start adding the code for our RAG functionality, we need to install some new dependecies.
 
-To create this file, right-click on the `ai` folder in the file tree, then select "New File..." and enter the name of the new file `rag.mjs`. The empty file will open.
+Run the following command in the VS Code terminal to install new application dependencies.
+
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npm install @langchain/community pdf-parse @xenova/transformers
+----
+
+Create a new file, `rag.mjs` in the `app/ai` folder.  Copy the following code and paste it into the `rag.mjs` file.
+
+To create this file, right-click on the `app/ai` folder in the file tree, then select "New File..." and enter the name of the new file `rag.mjs`. The empty file will open.
 
 Copy the following code and paste it into the content editor.
 
@@ -276,55 +287,88 @@ export default async function createRagRetrieverChain(model, prompt) {
 <4> Create a chain that passes a list of documents to a model
 <5> Create a retrieval chain that retrieves documents and then passes them on
 
-We next need to make a couple small updates to our existing chatbot.
+We need to update our existing chatbot to add the RAG functionality we just created, so replace all the current code in `app/ai/chatbot.mjs` with the following.  Most of the code is the same but we will call out the changes below.
 
-We first need to import the newly created `rag.mjs` file to use its exported function, `createRagRetrieverChain`.
-
-Open the `chatbot.mjs` file in the `ai` folder and add the following to the first top of the file.
-
-[.console-output]
-[source,javascript]
+[.console-input]
+[source,javascript,subs="+attributes,macros+"]
 ----
-import createRagRetrieverChain from './rag.mjs';
-----
+import createRagRetrieverChain from './rag.mjs'; <1>
 
-Next, we will need to update the prompt to allow for the new RAG context to be injected.
+import { RunnableWithMessageHistory } from '@langchain/core/runnables';
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { ChatMessageHistory } from 'langchain/stores/message/in_memory';
 
-Replace the `system` prompt tuple entry with the following code:
+let sessions = {};
+let chainWithHistory;
 
-[.console-output]
-[source,javascript]
-----
-[ 'system',
+export async function createChain(model) {
+  //////////////////////////////
+  // CREATE CHAIN
+
+  const prompt = ChatPromptTemplate.fromMessages([
+    [ 'system',
       'You are a helpful, respectful and honest assistant named "Parasol Assistant".' +
       'You will be given a claim summary, references to provide you with information, and a question. You must answer the question based as much as possible on this claim with the help of the references.' +
       'Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.' +
-      'If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\'t know the answer to a question, please don\'t share false information.' +
+      'If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don\'t know the answer to a question, please don\'t share false information.' + 
       'You must answer in 4 sentences or less.' +
       'Don\'t make up policy term limits by yourself' +
-      'Context: {context}'
+      'Context: {context}' <2>
     ],
+    new MessagesPlaceholder('history'),
+    [ 'human', '{input}' ]
+  ]);
+
+  const chain = await createRagRetrieverChain(model, prompt); <3>
+
+  chainWithHistory = new RunnableWithMessageHistory({
+    runnable: chain,
+    getMessageHistory: (sessionId) => {
+      if (sessions[sessionId] === undefined) {
+        sessions[sessionId] = new ChatMessageHistory();
+      }
+      return sessions[sessionId];
+    },
+    inputMessagesKey: 'input',
+    outputMessagesKey: 'answer', <4>
+    historyMessagesKey: 'history',
+  });
+
+}
+
+export async function chat(question, sessionId) {
+  const result = await chainWithHistory.stream(
+    { input: createQuestion(question) },
+    { configurable: { sessionId: sessionId } }
+  );
+
+  return result;
+}
+
+export function resetSessions(sessionId) {
+  delete sessions[sessionId];
+}
+
+function createQuestion(rawQuestion) {
+  return `Claim ID: ${rawQuestion.claimId}
+
+  Claim Inception Date: ${rawQuestion.inceptionDate}
+
+  Claim Summary:
+
+  ${rawQuestion.claim}
+
+  Question: ${rawQuestion.query}
+  `
+}
 ----
 
-Notice that the only difference is that last line, `Context: {context}`.  This placeholder tells Langchain.js where to inject any new information we retrieve from our RAG vector store.
+<1> Import the newly created `rag.mjs` file to use its exported function, `createRagRetrieverChain`
+<2> Update the prompt to allow for the new RAG context to be injected
+<3> Use the function we created to create a new RAG retrieval chain
+<4> RAG retrieval chains output the response on the the answer property
 
-Next, we need to use our newly created function that we just imported.  Replace the line `const chain = prompt.pipe(model);` with the following:
-
-[.console-output]
-[source,javascript]
-----
-const chain = await createRagRetrieverChain(model, prompt);
-----
-
-Lastly, add the following key/value pair to the object passed to the `RunnableWithMessageHistory` function.  This should be added directly after the `inputMessagesKey` parameter:
-
-[.console-output]
-[source,javascript]
-----
-outputMessagesKey: 'answer',
-----
-
-That's all there is to it!  Each time we start a new chat session, our RAG code will read the `resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
+That's all there is to it!  Each time we start a new chat session, our RAG code will read the `app/resources/policies/policy-info.pdf` file and compute vectorized embeddings for all the text in the document. It will then store these embeddings into an in-memory vector store. When chatting with the chatbot the application will first query the vector store for relevant information, which it will then pass to the LLM with the user's query.
 
 Now ask the same question in the chat window:
 

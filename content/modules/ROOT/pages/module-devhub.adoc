@@ -56,12 +56,12 @@ git checkout -b new-gen-ai-service
 
 Before you starting coding, you will need to install the applications dependencies and build the webui.  These include libraries like https://fastify.dev/[Fastify^] and https://js.langchain.com/docs/introduction/[Langchain.js^].
 
-Run the following command in the VS Code terminal to install the applications dependencies and build the webui.
+Run the following command in the VS Code terminal to change into the application directory, install applications dependencies and build the webui.
 
 [.console-input]
 [source,bash,subs="+attributes,macros+"]
 ----
-npm install && npm run buildui
+cd app && npm install && npm run buildui
 ----
 
 We also installed https://nodemon.io/[Nodemon^].  Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for development.  We will start our application with this utility.
@@ -95,21 +95,20 @@ image::devhub/parasol_ui_web.png[]
 
 To add the new feature, you will either create or edit the following files.  You will also add a new dependency to the package.json. Use this list as a checklist to ensure you've made all the changes. If you get errors when you try to run the app, be sure each file was changed as described in the instructions below!
 
-* `ai/email.mjs` - interface for interacting with the underlying LLM
-* `routes/email-route.mjs` - A REST endpoint to interface with the email generator
-* `webui/src/app/components/EmailGenerate/EmailGenerate.tsx` - A React web component providing a simple interface for providing a customer email
-* `webui/src/app/routes.tsx` - A list of React routes to which you'll add the new Email generator component
-* `package.json` - Important information about the application, like which dependencies to install
+* `app/ai/email.mjs` - interface for interacting with the underlying LLM
+* `app/routes/email-route.mjs` - A REST endpoint to interface with the email generator
+* `app/server.mjs` - Main entry point for our Node.js application
+* `app/webui/src/app/components/EmailGenerate/EmailGenerate.tsx` - A React web component providing a simple interface for providing a customer email
+* `app/webui/src/app/routes.tsx` - A list of React routes to which you'll add the new Email generator component
+* `app/package.json` - Important information about the application, like which dependencies to install
 
 ==== Create The Node.js AI Service
 
-Create a new file, `email.mjs` in the `ai` folder to serve as the AI Service connection point between your application and the LLM.  Copy the following code and paste it into the `email.mjs` file.
+Create a new file, `email.mjs` in the `app/ai` folder to serve as the AI Service connection point between your application and the LLM.  Copy the following code and paste it into the `email.mjs` file.
 
-To create this file, right-click on the `ai` folder in the file tree, then select "New File..." and enter the name of the new file `email.mjs`. The empty file will open.
+To create this file, right-click on the `app/ai` folder in the file tree, then select "New File..." and enter the name of the new file `email.mjs`. The empty file will open.
 
-TODO: update image
-
-image::devhub/new-file.png[new-file, 500]
+image::devhub/new-file-nodejs.png[new-file, 500]
 
 Copy the following code and paste it into the content editor.
 
@@ -169,7 +168,7 @@ Run the following command in the VS Code terminal to install this new dependency
 npm install zod
 ----
 
-The update dependencies section of the package.json should look similar:
+The update dependencies section of the app/package.json should look similar:
 
 [.console-input]
 [source,json,subs="+attributes,macros+"]
@@ -191,7 +190,7 @@ The update dependencies section of the package.json should look similar:
 
 ==== Create Fastify REST resource
 
-Create a new Node.js file, `email-route.mjs` in the `routes` folder to serve a new REST endpoint. Copy the following code and paste it into the `email-route.mjs` file.
+Create a new Node.js file, `email-route.mjs` in the `app/routes` folder to serve a new REST endpoint. Copy the following code and paste it into the `email-route.mjs` file.
 
 [.console-input]
 [source,javascript,subs="+attributes,macros+"]
@@ -202,7 +201,11 @@ import { createChainAndAskQuestion } from '../ai/email.mjs';
 async function emailRoute(fastify, options) {
   fastify.post('/api/email', async (request, reply) => {<1>
     // AI Related Setup
-    const model = getModel();
+     // AI Related Setup
+    const model = getModel({ <2>
+        modelName: 'parasol-instruct',
+        baseURL: 'http://parasol-instruct-predictor.aiworkshop.svc.cluster.local:8080/v1'
+    });
     // Create the chain and Ask the question
     const answer = await createChainAndAskQuestion(model, request.body.text);
     // Return the results
@@ -217,27 +220,27 @@ export default emailRoute;
 
 ----
 <1> defines the URL path for the resource.
+<2> pass the modelName and baseURL options to get a new model
 
+==== Add the New REST resource to the application
 
-// Probably don't need any LLM model config updates, but not sure.  either way, it won't be this file
-//==== Add new LLM model configurations
+Open the `server.mjs` file in the `app/` folder and add the following lines to register our newly created REST endpoint:
 
-// Open the existing `application.properties` file in the `src/main/resources` folder to append the following Langchain4j configuration values.
+First we need to import the newly created file, which should be added around line 11 after the import of the claims route
 
-// [.console-input]
-// [source,properties,subs="+attributes,macros+"]
-// ----
-// quarkus.langchain4j.parasol-email.chat-model.provider=openai<1>
-// quarkus.langchain4j.openai.parasol-email.chat-model.temperature=0.3<2>
-// quarkus.langchain4j.openai.parasol-email.timeout=600s<3>
-// quarkus.langchain4j.openai.parasol-email.chat-model.model-name=parasol-instruct<4>
-// quarkus.langchain4j.openai.parasol-email.base-url=http://parasol-instruct-predictor.aiworkshop.svc.cluster.local:8080/v1<5>
-// ----
-// <1> Specify the model provider (e.g., openai, huggingface). Note that you use the Open AI API specification when you connect to the LLM (parasol-instruct) inference endpoint
-// <2> Set the model temperature. Temperature is a parameter used in natural language processing models to increase or decrease the “confidence” a model has in its most likely response
-// <3> Specify the timeout between question and response in the LLM
-// <4> Specify the model name to connect to
-// <5> Specify the base URL of the LLM inference endpoint that the application will connect to
+[.console-input]
+[source,javascript,subs="+attributes,macros+"]
+----
+import emailRoute from './routes/email-route.mjs';
+----
+
+Next, register the endpoint with the Fastify server by adding the following code around line 45, which is near the other endpoint registrations:
+
+[.console-input]
+[source,javascript,subs="+attributes,macros+"]
+----
+fastify.register(emailRoute);
+----
 
 === Update the frontend web application in Parasol Insurance
 
@@ -245,7 +248,7 @@ Let's update the frontend React web application to give our customer service rep
 
 ==== Create new React TypeScript component
 
-Create a new `EmailGenerate` folder in the `webui/src/app/components` folder. Also, create a new TypeScript XML file, `EmailGenerate.tsx` in the `webui/src/app/components/EmailGenerate` folder to render the output of the LLM in the email subject and body content. Copy the following code and paste it into the EmailGenerate.tsx file.
+Create a new `EmailGenerate` folder in the `app/webui/src/app/components` folder. Also, create a new TypeScript XML file, `EmailGenerate.tsx` in the `app/webui/src/app/components/EmailGenerate` folder to render the output of the LLM in the email subject and body content. Copy the following code and paste it into the EmailGenerate.tsx file.
 
 [.console-input]
 [source,javascript,subs="+attributes,macros+"]
@@ -338,7 +341,7 @@ This interface allows customer service representatives to copy and paste the cus
 
 ==== Add a new menu item in the navigation bar
 
-Open the `routes.tsx` file in the `webui/src/app` folder and `uncomment` the following code out in line *8* and *89 - 95* to show the new menu item.
+Open the `routes.tsx` file in the `app/webui/src/app` folder and `uncomment` the following code out in line *8* and *89 - 95* to show the new menu item.
 
 [NOTE]
 ====
@@ -367,7 +370,26 @@ import { EmailGenerate } from './components/EmailGenerate/EmailGenerate';
 
 TODO: update for Node.js local testing and instructions for building the Webui again.  maybe this is part of the nodemon run?
 
-Before committing, do a quick functional test locally to ensure you got all the changes correct. If you stopped the Nodemon process, start it again.
+Before committing, do a quick functional test locally to ensure you got all the changes correct. We first need to rebuild the Web UI, so stop the nodemon process if it isn't already stopped.  Then run the following command to rebuild the UI:
+
+[NOTE]
+====
+Press kbd:[Ctrl+c] in the terminal window to stop the running process.
+====
+
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npm run buildui
+----
+
+Once the UI finishes rebuild, run the nodemon process again using this command:
+
+[.console-input]
+[source,bash,subs="+attributes,macros+"]
+----
+npx nodemon
+----
 
 Reload the https://{user}-parasol-insurance-parasol-webui.{openshift_cluster_ingress_domain}[Parasol web page^].
 

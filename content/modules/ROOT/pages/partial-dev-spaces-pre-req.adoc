@@ -49,4 +49,4 @@ Then you should see:
 
 TODO: image update for NOde.js.  currently shows a maven project in vscode
 
-image::devhub/devspaces_view.png[devspaces_view, 800]
+image::devhub/devspaces_view_nodejs.png[devspaces_view_nodejs, 800]
